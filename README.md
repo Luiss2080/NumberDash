@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/estado-funcional%20(prototipo)-orange?style=for-the-badge" alt="Estado: funcional, prototipo" />
   <img src="https://img.shields.io/badge/python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3" />
   <img src="https://img.shields.io/badge/pygame-requerido-2C8C3C?style=for-the-badge" alt="pygame" />
-  <img src="https://img.shields.io/badge/tests-0-lightgrey?style=for-the-badge" alt="Sin tests" />
+  <img src="https://img.shields.io/badge/tests-123%20pasan-brightgreen?style=for-the-badge" alt="123 tests" />
   <p>
     <a href="#-inicio-rápido">Inicio rápido</a> ·
     <a href="#-características">Características</a> ·
@@ -15,7 +15,7 @@
   </p>
 </div>
 
-NumberDash (título de ventana: *LISA MATH CHALLENGE*) es un juego de un solo archivo (`NumberDash.py`, ~720 líneas) hecho con pygame. Las operaciones aparecen a la izquierda y se desplazan hacia la derecha; el jugador teclea el resultado y, al coincidir, la operación desaparece (no hay tecla Enter). Es un proyecto educativo/de práctica: **no** tiene puntuaciones guardadas, multijugador ni instalador, y su banco de ejercicios contiene errores conocidos (ver [limitaciones](#-lo-que-todavía-no-existe)).
+NumberDash (título de ventana: *LISA MATH CHALLENGE*) es un juego de un solo archivo (`NumberDash.py`, ~720 líneas) hecho con pygame. Las operaciones aparecen a la izquierda y se desplazan hacia la derecha; el jugador teclea el resultado y, al coincidir, la operación desaparece (no hay tecla Enter). Es un proyecto educativo/de práctica: **no** tiene puntuaciones guardadas, multijugador ni instalador,.
 
 ## 🎬 Vista rápida
 
@@ -35,7 +35,7 @@ NumberDash (título de ventana: *LISA MATH CHALLENGE*) es un juego de un solo ar
 | Vidas | 3 vidas; se pierde una cada vez que una operación sale por el borde derecho sin ser respondida. |
 | Dificultad progresiva | Aparece una operación más cada 8 puntos y la velocidad crece con la puntuación (`0.1 + puntos/50` px por frame). |
 | Sin repetición inmediata | Evita repetir ninguna de las últimas 10 operaciones mostradas. |
-| Entrada por teclado | Se compara lo escrito con la respuesta (sin distinguir mayúsculas y quitando espacios); acierta al instante, sin Enter. Retroceso borra. |
+| Entrada por teclado | Se compara el valor numérico de lo escrito con la respuesta (`1/2`, `2/4` y `0.5` son equivalentes); acierta al instante, sin Enter. Retroceso borra. |
 | Interfaz | Menú con logo animado, pantalla de instrucciones, fondo e imagen distintos por nivel, música por nivel y efectos de acierto/fallo/fin de juego. |
 | Marcador | Puntos, tiempo transcurrido y corazones de vida en pantalla. |
 
@@ -99,16 +99,19 @@ Controles: clic en los botones del menú; en partida, teclado para la respuesta,
 
 ## 🧪 Pruebas
 
-No hay pruebas automatizadas. Se hizo una revisión aparte de las 120 respuestas del banco de ejercicios evaluándolas con `fractions.Fraction`: **14 no coinciden con el resultado matemático** (detalle abajo).
+`tests/test_banco_ejercicios.py` recorre las 120 preguntas del banco, evalúa cada operación con aritmética exacta (`fractions.Fraction`, sin `eval`) y comprueba que la respuesta guardada es correcta y está simplificada; también prueba la comparación de respuestas. No necesita pantalla ni los `.wav`.
+
+```bash
+pip install pytest
+python -m pytest -q tests   # 123 tests
+```
 
 ## 🚧 Lo que todavía no existe
 
-- **Respuestas incorrectas en el banco de ejercicios (14 de 120)**; quien responda correctamente no puntúa y pierde vidas. Ejemplos: `(8 + 3) * 2 - 5` figura como `21` (es 17); `(5/8) - (2/3)` como `1/24` (es −1/24); `(6/8) + (2/5)` como `19/20` (es 23/20); `2^5 + 3^3` como `41` (es 59); `6^2 / 2^3` como `9` (es 4,5). Afecta a los niveles intermedio, avanzado y experto.
-- Las fracciones se comparan como texto: el nivel avanzado exige la forma exacta del banco, y algunas respuestas correctas no están simplificadas (`15/63`, `20/72`, `6/20`).
 - Los ejercicios son fijos (listas escritas a mano); no se generan de forma aleatoria.
-- Sin `requirements.txt`, sin instalador ni empaquetado, sin pruebas, sin CI.
+- Sin `requirements.txt`, sin instalador ni empaquetado, sin CI.
 - Sin guardado de puntuaciones ni récords. `VOLVER` desde la partida no reinicia puntos/vidas.
-- Detalles del código: el clic de `VOLVER` sale del bucle con cualquier clic del ratón durante la partida; las pantallas se llaman unas a otras de forma recursiva; el texto de instrucciones habla de un "menú de pausa" que no existe.
+- Detalles del código: el clic de `VOLVER` sale del bucle con cualquier clic del ratón durante la partida; las pantallas se llaman unas a otras de forma recursiva; no hay menú de pausa (las instrucciones ya lo indican: `ESC` abandona la partida).
 - El repositorio arrastra ~80 MB de audio `.wav` sin comprimir, lo que hace lento el clonado.
 
 ## 📄 Licencia

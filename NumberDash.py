@@ -3,6 +3,8 @@ import random
 import sys
 import os
 
+from respuestas import es_correcta
+
 # Inicializar pygame
 pygame.init()
 pygame.mixer.init()
@@ -124,7 +126,7 @@ temas = {
             ("¿Cuánto es 15 - 7 + 3?", "11"),
             ("¿Cuánto es 3 * (5 + 3)?", "24"),
             ("¿Cuánto es 16 / (2 + 2)?", "4"),
-            ("¿Cuánto es (8 + 3) * 2 - 5?", "21"),
+            ("¿Cuánto es (8 + 3) * 2 - 5?", "17"),
             ("¿Cuánto es (20 / 5) + 6?", "10"),
             ("¿Cuánto es 18 - 4 + 3 * 2?", "20"),
             ("¿Cuánto es 7 * 4 - 8?", "20"),
@@ -152,9 +154,9 @@ temas = {
 
         "EJERCICIOS": [
            ("¿Cuánto es (3/4) + (1/6)?", "11/12"),
-            ("¿Cuánto es (5/8) - (2/3)?", "1/24"),
+            ("¿Cuánto es (5/8) - (2/3)?", "-1/24"),
             ("¿Cuánto es (2/5) * (7/9)?", "14/45"),
-            ("¿Cuánto es (5/12) + (1/8)?", "17/24"),
+            ("¿Cuánto es (5/12) + (1/8)?", "13/24"),
             ("¿Cuánto es (7/10) - (2/5)?", "3/10"),
             ("¿Cuánto es (2/3) * (5/7)?", "10/21"),
             ("¿Cuánto es (1/2) + (3/4)?", "5/4"),
@@ -162,25 +164,25 @@ temas = {
             ("¿Cuánto es (3/5) - (1/4)?", "7/20"),
             ("¿Cuánto es (2/3) * (4/5)?", "8/15"),
             ("¿Cuánto es (7/8) + (1/2)?", "11/8"),
-            ("¿Cuánto es (5/6) - (2/5)?", "7/30"),
-            ("¿Cuánto es (3/7) * (5/9)?", "15/63"),
+            ("¿Cuánto es (5/6) - (2/5)?", "13/30"),
+            ("¿Cuánto es (3/7) * (5/9)?", "5/21"),
             ("¿Cuánto es (1/4) + (3/8)?", "5/8"),
             ("¿Cuánto es (5/6) - (1/3)?", "1/2"),
             ("¿Cuánto es (7/10) + (3/5)?", "13/10"),
-            ("¿Cuánto es (4/9) * (5/8)?", "20/72"),
-            ("¿Cuánto es (9/12) - (2/6)?", "1/6"),
-            ("¿Cuánto es (2/5) * (3/4)?", "6/20"),
+            ("¿Cuánto es (4/9) * (5/8)?", "5/18"),
+            ("¿Cuánto es (9/12) - (2/6)?", "5/12"),
+            ("¿Cuánto es (2/5) * (3/4)?", "3/10"),
             ("¿Cuánto es (11/12) + (1/6)?", "13/12"),
-            ("¿Cuánto es (5/7) - (3/14)?", "4/14"),
-            ("¿Cuánto es (6/8) + (2/5)?", "19/20"),
+            ("¿Cuánto es (5/7) - (3/14)?", "1/2"),
+            ("¿Cuánto es (6/8) + (2/5)?", "23/20"),
             ("¿Cuánto es (3/5) - (1/2)?", "1/10"),
             ("¿Cuánto es (2/7) + (5/8)?", "51/56"),
             ("¿Cuánto es (4/9) * (2/5)?", "8/45"),
             ("¿Cuánto es (5/6) - (1/3)?", "1/2"),
             ("¿Cuánto es (3/8) * (5/7)?", "15/56"),
             ("¿Cuánto es (7/8) + (3/4)?", "13/8"),
-            ("¿Cuánto es (5/6) + (2/9)?", "13/18"),
-            ("¿Cuánto es (9/10) - (7/15)?", "11/30")
+            ("¿Cuánto es (5/6) + (2/9)?", "19/18"),
+            ("¿Cuánto es (9/10) - (7/15)?", "13/30")
                    ]
     },
     "- NIVEL EXPERTO -": {
@@ -201,16 +203,16 @@ temas = {
             ("¿Cuánto es 9^2 - 3^3?", "54"),
             ("¿Cuánto es 3^3 * 2?", "54"),
             ("¿Cuánto es (4^2) / (2^2)?", "4"),
-            ("¿Cuánto es 5^3 - 4^2?", "101"),
-            ("¿Cuánto es 2^5 + 3^3?", "41"),
+            ("¿Cuánto es 5^3 - 4^2?", "109"),
+            ("¿Cuánto es 2^5 + 3^3?", "59"),
             ("¿Cuánto es (7^2) - (5^2)?", "24"),
             ("¿Cuánto es (3^3) + (4^3)?", "91"),
-            ("¿Cuánto es 6^2 / 2^3?", "9"),
-            ("¿Cuánto es (5^4) - (3^2)?", "619"),
+            ("¿Cuánto es 6^2 / 2^3?", "9/2"),
+            ("¿Cuánto es (5^4) - (3^2)?", "616"),
             ("¿Cuánto es (4^3) + (2^5)?", "96"),
             ("¿Cuánto es 9^2 - 6^2?", "45"),
             ("¿Cuánto es (10^2) - (4^2)?", "84"),
-            ("¿Cuánto es (2^6) + (3^3)?", "73"),
+            ("¿Cuánto es (2^6) + (3^3)?", "91"),
             ("¿Cuánto es (5^5) / (5^3)?", "25"),
             ("¿Cuánto es (7^3) - (3^2)?", "334"),
             ("¿Cuánto es (8^2) * (2^3)?", "512"),
@@ -422,7 +424,7 @@ def mostrar_instrucciones():
     "4. La dificultad y velocidad aumentan a medida que avanzas en los niveles.",
     "5. Usa el teclado para escribir la respuesta correcta.",
     "6. Si pierdes todas las vidas, deberás reiniciar el nivel.",
-    "7. Pausa el juego en cualquier momento desde el menú de pausa.",
+    "7. Pulsa ESC para abandonar la partida (no hay menú de pausa).",
     "8. El objetivo es responder correctamente la mayor cantidad de ejercicios."
         ]
 
@@ -651,12 +653,12 @@ def bucle_juego():
                         temas[tema_actual]["fondo"].stop()
                         game_over()
 
-                if texto_ingresado.strip().lower() == EJERCICIO["palabra_correcta"].lower():
+                if es_correcta(texto_ingresado, EJERCICIO["palabra_correcta"]):
                     puntuacion += 1
                     temas[tema_actual]["clic"].play()
                     # Encontrar la EJERCICIO correcta y eliminarla
                     for p in EJERCICIOS_en_pantalla:
-                        if p["palabra_correcta"].lower() == EJERCICIO["palabra_correcta"].lower():
+                        if es_correcta(p["palabra_correcta"], EJERCICIO["palabra_correcta"]):
                             EJERCICIOS_en_pantalla.remove(p)
                             # Establecer la posición de la puntuación
                             if not posicion_puntuacion:
