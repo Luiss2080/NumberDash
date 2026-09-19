@@ -29,6 +29,10 @@ function App() {
     setFinalScore(score);
     setView('gameover');
     
+    // Reproducir sonido Game Over
+    const sndOver = new Audio('/sounds/GameOver.wav');
+    sndOver.play().catch(() => {});
+    
     // Guardar nuevo récord si es mayor
     if (score > highScores[difficulty]) {
       const updatedScores = { ...highScores, [difficulty]: score };

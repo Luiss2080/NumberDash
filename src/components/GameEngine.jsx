@@ -40,18 +40,25 @@ const generateExercise = (difficulty) => {
 function GameEngine({ difficulty, onGameOver, onQuit }) {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
+  const [combo, setCombo] = useState(0);
   const [input, setInput] = useState('');
   const [exercises, setExercises] = useState([]);
+  
+  // Audios
+  const sndCorrect = useRef(new Audio('/sounds/Correcta.wav'));
+  const sndError = useRef(new Audio('/sounds/equivocado.wav'));
   
   const exercisesRef = useRef(exercises);
   const scoreRef = useRef(score);
   const livesRef = useRef(lives);
+  const comboRef = useRef(combo);
   const requestRef = useRef();
   
   // Sincronizar refs
   useEffect(() => { exercisesRef.current = exercises; }, [exercises]);
   useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { livesRef.current = lives; }, [lives]);
+  useEffect(() => { comboRef.current = combo; }, [combo]);
 
   const removeExercise = useCallback((id) => {
     setExercises(prev => prev.filter(e => e.id !== id));
@@ -87,6 +94,13 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
     if (livesLost > 0) {
       const newLives = livesRef.current - livesLost;
       setLives(newLives);
+      setCombo(0); // Reset combo
+      
+      if (newLives > 0) {
+        sndError.current.currentTime = 0;
+        sndError.current.play().catch(() => {});
+      }
+
       if (newLives <= 0) {
         onGameOver(scoreRef.current);
         return; // Salir del loop
@@ -121,7 +135,16 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
           const matchedEx = exercisesRef.current.find(ex => ex.answer === newVal);
           if (matchedEx) {
             removeExercise(matchedEx.id);
-            setScore(s => s + 1);
+            
+            const currentCombo = comboRef.current;
+            const pointsEarned = 1 + Math.floor(currentCombo / 5); // Bonus per 5 combo
+            
+            setScore(s => s + pointsEarned);
+            setCombo(c => c + 1);
+            
+            sndCorrect.current.currentTime = 0;
+            sndCorrect.current.play().catch(() => {});
+            
             return ''; // Limpiar input
           }
           return newVal;
@@ -140,6 +163,7 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
         <div className="glass-panel" style={{ padding: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <span style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>Nivel: <strong style={{ color: 'var(--text-primary)'}}>{difficulty}</strong></span>
           <span style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>Puntos: <strong style={{ color: 'var(--accent-primary)'}}>{score}</strong></span>
+          <span style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>Combo: <strong style={{ color: 'var(--accent-secondary)'}}>x{combo}</strong></span>
           <span style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>Vidas: <strong style={{ color: 'var(--danger)'}}>{'❤️'.repeat(lives)}</strong></span>
         </div>
       </div>
