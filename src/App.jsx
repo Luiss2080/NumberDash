@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GameEngine from './components/GameEngine';
 
 function App() {
-  const [view, setView] = useState('menu'); // 'menu', 'instructions', 'playing', 'gameover'
+  const [view, setView] = useState('menu'); // 'menu', 'instructions', 'playing', 'gameover', 'scores'
   const [difficulty, setDifficulty] = useState(null);
   const [finalScore, setFinalScore] = useState(0);
+  const [highScores, setHighScores] = useState({
+    BÁSICO: 0,
+    INTERMEDIO: 0,
+    AVANZADO: 0,
+    EXPERTO: 0
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('numberdash_scores');
+    if (saved) {
+      setHighScores(JSON.parse(saved));
+    }
+  }, []);
+
 
   const startGame = (level) => {
     setDifficulty(level);
@@ -14,6 +28,13 @@ function App() {
   const handleGameOver = (score) => {
     setFinalScore(score);
     setView('gameover');
+    
+    // Guardar nuevo récord si es mayor
+    if (score > highScores[difficulty]) {
+      const updatedScores = { ...highScores, [difficulty]: score };
+      setHighScores(updatedScores);
+      localStorage.setItem('numberdash_scores', JSON.stringify(updatedScores));
+    }
   };
 
   return (
@@ -26,6 +47,9 @@ function App() {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <button className="btn-primary" onClick={() => setView('levelSelect')}>Jugar</button>
+            <button className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--glass-border)' }} onClick={() => setView('scores')}>
+              Puntuaciones
+            </button>
             <button className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--glass-border)' }} onClick={() => setView('instructions')}>
               Instrucciones
             </button>
@@ -65,6 +89,21 @@ function App() {
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
             <button className="btn-primary" onClick={() => setView('menu')}>Volver al Menú</button>
           </div>
+        </div>
+      )}
+
+      {view === 'scores' && (
+        <div className="glass-panel animate-slide-in" style={{ width: '90%', maxWidth: '400px', textAlign: 'center' }}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--accent-primary)' }}>Récords Locales</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem', textAlign: 'left', padding: '0 2rem' }}>
+            {Object.entries(highScores).map(([level, score]) => (
+              <div key={level} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{level}:</span>
+                <strong style={{ fontSize: '1.2rem' }}>{score}</strong>
+              </div>
+            ))}
+          </div>
+          <button className="btn-primary" onClick={() => setView('menu')}>Volver</button>
         </div>
       )}
 
