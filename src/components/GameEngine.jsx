@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Modal from './Modal';
+import Particles from './Particles';
+import { Home, Play, Pause } from 'lucide-react';
 
 // Generador de ejercicios simple basado en el nivel
 const generateExercise = (difficulty) => {
@@ -37,13 +40,15 @@ const generateExercise = (difficulty) => {
   };
 };
 
-function GameEngine({ difficulty, onGameOver, onQuit }) {
+function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [combo, setCombo] = useState(0);
   const [input, setInput] = useState('');
   const [exercises, setExercises] = useState([]);
   const [showComboAlert, setShowComboAlert] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [particleEvents, setParticleEvents] = useState([]);
   
   // Audios
   const sndCorrect = useRef(new Audio('/sounds/Correcta.wav'));
@@ -60,22 +65,36 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
   const comboRef = useRef(combo);
   const requestRef = useRef();
   
+  const isPausedRef = useRef(isPaused);
+
   // Sincronizar refs
   useEffect(() => { exercisesRef.current = exercises; }, [exercises]);
   useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { livesRef.current = lives; }, [lives]);
   useEffect(() => { comboRef.current = combo; }, [combo]);
+  useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
 
   // Manejar BGM
   useEffect(() => {
     bgm.current.loop = true;
-    bgm.current.volume = 0.4;
+    bgm.current.volume = settings?.volume || 0.5;
+    sndCorrect.current.volume = settings?.volume || 0.5;
+    sndError.current.volume = settings?.volume || 0.5;
+    
     bgm.current.play().catch(() => {});
     return () => {
       bgm.current.pause();
       bgm.current.currentTime = 0;
     };
-  }, []);
+  }, [settings]);
+
+  useEffect(() => {
+    if (isPaused) {
+      bgm.current.pause();
+    } else {
+      bgm.current.play().catch(() => {});
+    }
+  }, [isPaused]);
 
   const removeExercise = useCallback((id) => {
     setExercises(prev => prev.filter(e => e.id !== id));
@@ -83,6 +102,11 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
 
   // Bucle principal del juego
   const gameLoop = useCallback((time) => {
+    if (isPausedRef.current) {
+      requestRef.current = requestAnimationFrame(gameLoop);
+      return;
+    }
+
     // Generar nuevos ejercicios periódicamente
     const currentExercises = exercisesRef.current;
     
@@ -153,6 +177,13 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
           if (matchedEx) {
             removeExercise(matchedEx.id);
             
+            // Partículas
+            if (settings?.particlesEnabled) {
+              setParticleEvents(prevP => [...prevP, { id: Math.random(), x: matchedEx.x, y: matchedEx.y }]);
+              // Limpiar para no acumular basura (simplificado)
+              setTimeout(() => setParticleEvents(p => p.slice(1)), 2000);
+            }
+            
             const currentCombo = comboRef.current;
             const pointsEarned = 1 + Math.floor(currentCombo / 5); // Bonus per 5 combo
             
@@ -182,6 +213,10 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
       
+      {settings?.particlesEnabled && particleEvents.map(pe => (
+        <Particles key={pe.id} targetPos={{ x: pe.x, y: pe.y }} />
+      ))}
+
       {/* UI Overlay */}
       <div style={{ position: 'absolute', top: '20px', left: '20px', display: 'flex', gap: '2rem', zIndex: 10 }}>
         <div className="glass-panel" style={{ padding: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -194,11 +229,23 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
       
       <button 
         className="btn-primary" 
-        style={{ position: 'absolute', top: '20px', right: '20px', padding: '0.8rem 1.5rem', background: 'transparent', border: '1px solid var(--glass-border)' }}
-        onClick={onQuit}
+        style={{ position: 'absolute', top: '20px', right: '20px', padding: '0.8rem 1.5rem', background: 'transparent', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', gap: '8px' }}
+        onClick={() => setIsPaused(true)}
       >
-        Salir (ESC)
+        <Pause size={18} /> Pausa
       </button>
+
+      {/* Modal de Pausa */}
+      <Modal isOpen={isPaused} title="Pausa">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', padding: '1rem' }}>
+          <button className="btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '10px' }} onClick={() => setIsPaused(false)}>
+            <Play size={20} /> Reanudar
+          </button>
+          <button className="btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '10px', background: 'transparent', border: '1px solid var(--glass-border)' }} onClick={onQuit}>
+            <Home size={20} /> Salir al Menú
+          </button>
+        </div>
+      </Modal>
 
       {/* Alerta de Combo (Fever Mode) */}
       {showComboAlert && (
