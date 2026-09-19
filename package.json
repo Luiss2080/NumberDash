@@ -1,0 +1,25 @@
+{
+  "name": "numberdash",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">\r   <img src=\"docs/assets/logo.svg\" width=\"96\" alt=\"Logo de NumberDash\" />\r   <h1>NumberDash</h1>\r   <p><b>Juego de escritorio en pygame para practicar cálculo mental: escribe la respuesta antes de que la operación cruce la pantalla.</b></p>\r   <img src=\"https://img.shields.io/badge/estado-funcional%20(prototipo)-orange?style=for-the-badge\" alt=\"Estado: funcional, prototipo\" />\r   <img src=\"https://img.shields.io/badge/python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white\" alt=\"Python 3\" />\r   <img src=\"https://img.shields.io/badge/pygame-requerido-2C8C3C?style=for-the-badge\" alt=\"pygame\" />\r   <img src=\"https://img.shields.io/badge/tests-123%20pasan-brightgreen?style=for-the-badge\" alt=\"123 tests\" />\r   <p>\r     <a href=\"#-inicio-rápido\">Inicio rápido</a> ·\r     <a href=\"#-características\">Características</a> ·\r     <a href=\"#-arquitectura\">Arquitectura</a> ·\r     <a href=\"#-pruebas\">Pruebas</a> ·\r     <a href=\"#-lo-que-todavía-no-existe\">Limitaciones</a>\r   </p>\r </div>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Luiss2080/NumberDash.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Luiss2080/NumberDash/issues"
+  },
+  "homepage": "https://github.com/Luiss2080/NumberDash#readme"
+}
