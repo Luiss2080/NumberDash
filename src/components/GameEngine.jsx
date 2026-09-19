@@ -210,9 +210,33 @@ function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onQuit, removeExercise]);
 
+  // Determinar la imagen de fondo según la dificultad
+  let bgImage = '';
+  switch (difficulty) {
+    case 'BÁSICO': bgImage = '/images/PastSimple.png'; break;
+    case 'INTERMEDIO': bgImage = '/images/Comparativos.jpg'; break;
+    case 'AVANZADO': bgImage = '/images/PresentPerfect.png'; break;
+    case 'EXPERTO': bgImage = '/images/Will.jpg'; break;
+    default: bgImage = '';
+  }
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
       
+      {/* Dynamic Background Image */}
+      {bgImage && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.15, // Muy sutil para no interferir con la visibilidad
+          zIndex: 0,
+          pointerEvents: 'none',
+          filter: 'blur(3px)'
+        }} />
+      )}
+
       {settings?.particlesEnabled && particleEvents.map(pe => (
         <Particles key={pe.id} targetPos={{ x: pe.x, y: pe.y }} />
       ))}
