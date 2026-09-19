@@ -43,10 +43,16 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
   const [combo, setCombo] = useState(0);
   const [input, setInput] = useState('');
   const [exercises, setExercises] = useState([]);
+  const [showComboAlert, setShowComboAlert] = useState(false);
   
   // Audios
   const sndCorrect = useRef(new Audio('/sounds/Correcta.wav'));
   const sndError = useRef(new Audio('/sounds/equivocado.wav'));
+  const bgm = useRef(new Audio(
+    difficulty === 'BÁSICO' ? '/sounds/Stage1.wav' :
+    difficulty === 'INTERMEDIO' ? '/sounds/Stage2.wav' :
+    difficulty === 'AVANZADO' ? '/sounds/Stage3.wav' : '/sounds/Stage4.wav'
+  ));
   
   const exercisesRef = useRef(exercises);
   const scoreRef = useRef(score);
@@ -59,6 +65,17 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
   useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { livesRef.current = lives; }, [lives]);
   useEffect(() => { comboRef.current = combo; }, [combo]);
+
+  // Manejar BGM
+  useEffect(() => {
+    bgm.current.loop = true;
+    bgm.current.volume = 0.4;
+    bgm.current.play().catch(() => {});
+    return () => {
+      bgm.current.pause();
+      bgm.current.currentTime = 0;
+    };
+  }, []);
 
   const removeExercise = useCallback((id) => {
     setExercises(prev => prev.filter(e => e.id !== id));
@@ -140,7 +157,14 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
             const pointsEarned = 1 + Math.floor(currentCombo / 5); // Bonus per 5 combo
             
             setScore(s => s + pointsEarned);
-            setCombo(c => c + 1);
+            setCombo(c => {
+              const newCombo = c + 1;
+              if (newCombo > 0 && newCombo % 10 === 0) {
+                setShowComboAlert(true);
+                setTimeout(() => setShowComboAlert(false), 2000);
+              }
+              return newCombo;
+            });
             
             sndCorrect.current.currentTime = 0;
             sndCorrect.current.play().catch(() => {});
@@ -175,6 +199,16 @@ function GameEngine({ difficulty, onGameOver, onQuit }) {
       >
         Salir (ESC)
       </button>
+
+      {/* Alerta de Combo (Fever Mode) */}
+      {showComboAlert && (
+        <div className="animate-slide-in" style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 20, textAlign: 'center', pointerEvents: 'none' }}>
+          <h2 style={{ fontSize: '4rem', color: 'var(--accent-secondary)', textShadow: '0 0 20px var(--accent-secondary)', margin: 0, fontStyle: 'italic', fontFamily: 'var(--font-heading)' }}>
+            COMBO x{combo}!
+          </h2>
+          <p style={{ fontSize: '1.5rem', color: 'white', margin: 0, fontWeight: 'bold' }}>¡Estás en llamas! 🔥</p>
+        </div>
+      )}
 
       {/* Input de usuario centrado abajo */}
       <div style={{ position: 'absolute', bottom: '10%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10 }}>
