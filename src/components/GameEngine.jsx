@@ -40,7 +40,7 @@ const generateExercise = (difficulty) => {
   };
 };
 
-function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
+function GameEngine({ difficulty, settings, onGameOver, onQuit, onAchievementUnlock }) {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [combo, setCombo] = useState(0);
@@ -49,6 +49,7 @@ function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
   const [showComboAlert, setShowComboAlert] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [particleEvents, setParticleEvents] = useState([]);
+  const [sessionCorrect, setSessionCorrect] = useState(0);
   
   // Audios
   const sndCorrect = useRef(new Audio('/sounds/Correcta.wav'));
@@ -66,6 +67,7 @@ function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
   const requestRef = useRef();
   
   const isPausedRef = useRef(isPaused);
+  const sessionCorrectRef = useRef(sessionCorrect);
 
   // Sincronizar refs
   useEffect(() => { exercisesRef.current = exercises; }, [exercises]);
@@ -73,6 +75,7 @@ function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
   useEffect(() => { livesRef.current = lives; }, [lives]);
   useEffect(() => { comboRef.current = combo; }, [combo]);
   useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
+  useEffect(() => { sessionCorrectRef.current = sessionCorrect; }, [sessionCorrect]);
 
   // Manejar BGM
   useEffect(() => {
@@ -143,7 +146,7 @@ function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
       }
 
       if (newLives <= 0) {
-        onGameOver(scoreRef.current);
+        onGameOver(scoreRef.current, sessionCorrectRef.current);
         return; // Salir del loop
       }
     }
@@ -187,11 +190,13 @@ function GameEngine({ difficulty, settings, onGameOver, onQuit }) {
             const currentCombo = comboRef.current;
             const pointsEarned = 1 + Math.floor(currentCombo / 5); // Bonus per 5 combo
             
+            setSessionCorrect(sc => sc + 1);
             setScore(s => s + pointsEarned);
             setCombo(c => {
               const newCombo = c + 1;
               if (newCombo > 0 && newCombo % 10 === 0) {
                 setShowComboAlert(true);
+                if (onAchievementUnlock) onAchievementUnlock('combo_10');
                 setTimeout(() => setShowComboAlert(false), 2000);
               }
               return newCombo;
